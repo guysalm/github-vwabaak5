@@ -163,6 +163,138 @@ export const useSubcontractors = () => {
     error,
     fetchSubcontractors,
     createSubcontractor,
+    updateSubcontractor,
+    deleteSubcontractor,
     isUsingMockData
+  }
+
+  const updateSubcontractor = async (id: string, updates: Partial<Omit<Subcontractor, 'id' | 'created_at'>>) => {
+    try {
+      console.log('Updating subcontractor:', id, 'with updates:', updates)
+      
+      // Validate required fields
+      if (updates.name !== undefined && !updates.name) {
+        throw new Error('Name is required')
+      }
+      if (updates.phone !== undefined && !updates.phone) {
+        throw new Error('Phone is required')
+      }
+      if (updates.email !== undefined && !updates.email) {
+        throw new Error('Email is required')
+      }
+      if (updates.region !== undefined && !updates.region) {
+        throw new Error('Region is required')
+      }
+
+      // If using mock data, update local state
+      if (isUsingMockData) {
+        setSubcontractors(prev => prev.map(sub => 
+          sub.id === id ? { ...sub, ...updates } : sub
+        ).sort((a, b) => a.name.localeCompare(b.name)))
+        return
+      }
+
+      // Test connection first
+      const connectionResult = await testConnection()
+      if (!connectionResult.success) {
+        throw new Error(connectionResult.error || 'Unable to connect to database')
+      }
+
+      // Set a timeout for the request
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000) // 15 second timeout
+
+      const { data, error } = await supabase
+        .from('subcontractors')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single()
+
+      clearTimeout(timeoutId)
+
+      if (error) {
+        console.error('Supabase update error:', error)
+        throw new Error(`Database error: ${error.message}`)
+      }
+
+      if (!data) {
+        throw new Error('No data returned after subcontractor update')
+      }
+
+      console.log('Subcontractor updated successfully:', data)
+      
+      setSubcontractors(prev => prev.map(sub => 
+        sub.id === id ? data : sub
+      ).sort((a, b) => a.name.localeCompare(b.name)))
+      
+      return data
+    } catch (err) {
+      console.error('Error in updateSubcontractor:', err)
+      
+      if (err instanceof Error) {
+        if (err.name === 'AbortError') {
+          throw new Error('Request timeout. Please check your internet connection and try again.')
+        } else if (err.message.includes('Failed to fetch')) {
+          throw new Error('Network error. Please check your internet connection and Supabase configuration.')
+        } else {
+          throw new Error(err.message)
+        }
+      } else {
+        throw new Error('Failed to update subcontractor')
+      }
+    }
+  }
+
+  const deleteSubcontractor = async (id: string) => {
+    try {
+      console.log('Deleting subcontractor:', id)
+
+      // If using mock data, remove from local state
+      if (isUsingMockData) {
+        setSubcontractors(prev => prev.filter(sub => sub.id !== id))
+        return
+      }
+
+      // Test connection first
+      const connectionResult = await testConnection()
+      if (!connectionResult.success) {
+        throw new Error(connectionResult.error || 'Unable to connect to database')
+      }
+
+      // Set a timeout for the request
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000) // 15 second timeout
+
+      const { error } = await supabase
+        .from('subcontractors')
+        .delete()
+        .eq('id', id)
+
+      clearTimeout(timeoutId)
+
+      if (error) {
+        console.error('Supabase delete error:', error)
+        throw new Error(`Database error: ${error.message}`)
+      }
+
+      console.log('Subcontractor deleted successfully')
+      
+      setSubcontractors(prev => prev.filter(sub => sub.id !== id))
+    } catch (err) {
+      console.error('Error in deleteSubcontractor:', err)
+      
+      if (err instanceof Error) {
+        if (err.name === 'AbortError') {
+          throw new Error('Request timeout. Please check your internet connection and try again.')
+        } else if (err.message.includes('Failed to fetch')) {
+          throw new Error('Network error. Please check your internet connection and Supabase configuration.')
+        } else {
+          throw new Error(err.message)
+        }
+      } else {
+        throw new Error('Failed to delete subcontractor')
+      }
+    }
   }
 }
