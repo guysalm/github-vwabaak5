@@ -1,15 +1,29 @@
 import { createClient } from '@supabase/supabase-js'
 
-// For development, we'll use proper fallback values that won't break the app
-const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://rfbpudpbekmobsdrykoa.supabase.co'
-const supabaseAnonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4YW1wbGUiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MTc2OTIwMCwiZXhwIjoxOTU3MzQ1MjAwfQ.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE'
+// Get Supabase configuration from environment variables
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+// Validate that required environment variables are present
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    'Missing Supabase environment variables. Please check your .env file and ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set with your actual Supabase project credentials.'
+  )
+}
+
+// Check for placeholder values
+if (supabaseUrl.includes('your-project-ref') || supabaseAnonKey.includes('your-anon-public-key')) {
+  throw new Error(
+    'Please replace the placeholder Supabase credentials in your .env file with your actual Supabase project URL and API key.'
+  )
+}
 
 console.log('Supabase configuration:', {
   url: supabaseUrl,
   keyLength: supabaseAnonKey?.length || 0,
   hasUrl: !!supabaseUrl,
   hasKey: !!supabaseAnonKey,
-  isPlaceholder: supabaseUrl.includes('example')
+  isPlaceholder: supabaseUrl.includes('your-project-ref')
 })
 
 // Validate URL format before creating client
@@ -51,12 +65,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 export const testConnection = async (): Promise<{ success: boolean; error?: string }> => {
   try {
     console.log('Testing Supabase connection...')
-    
-    // If using placeholder values, return mock success for development
-    if (supabaseUrl.includes('example')) {
-      console.log('Using example Supabase configuration - mock mode')
-      return { success: true }
-    }
     
     // Set a timeout for the request
     const controller = new AbortController()
