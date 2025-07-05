@@ -153,21 +153,6 @@ export const useSubcontractors = () => {
     }
   }
 
-  useEffect(() => {
-    fetchSubcontractors()
-  }, [])
-
-  return {
-    subcontractors,
-    loading,
-    error,
-    fetchSubcontractors,
-    createSubcontractor,
-    updateSubcontractor,
-    deleteSubcontractor,
-    isUsingMockData
-  }
-
   const updateSubcontractor = async (id: string, updates: Partial<Omit<Subcontractor, 'id' | 'created_at'>>) => {
     try {
       console.log('Updating subcontractor:', id, 'with updates:', updates)
@@ -296,5 +281,20 @@ export const useSubcontractors = () => {
         throw new Error('Failed to delete subcontractor')
       }
     }
+  }
+
+  useEffect(() => {
+    fetchSubcontractors()
+  }, [])
+
+  return {
+    subcontractors,
+    loading,
+    error,
+    fetchSubcontractors,
+    createSubcontractor,
+    updateSubcontractor,
+    deleteSubcontractor,
+    isUsingMockData
   }
 }
