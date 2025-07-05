@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
+import path from 'path'
 import { createClient } from '@supabase/supabase-js'
 import { createServer } from 'http'
 import net from 'net'
@@ -46,6 +47,10 @@ process.on('unhandledRejection', (reason, promise) => {
 
 app.use(cors())
 app.use(express.json())
+
+// Serve static files from the dist directory (for production)
+const distPath = path.join(process.cwd(), 'dist')
+app.use(express.static(distPath))
 
 // Initialize Supabase clients
 let supabase
@@ -453,6 +458,22 @@ app.get('/api/health', (_req, res) => {
   } catch (error) {
     console.error('Error in health check:', error)
     res.status(500).json({ error: error instanceof Error ? error.message : String(error) })
+  }
+})
+
+// Catch-all handler: send back React's index.html file for any non-API routes
+app.get('*', (req, res) => {
+  // Only serve index.html for non-API routes
+  if (!req.path.startsWith('/api')) {
+    const indexPath = path.join(distPath, 'index.html')
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        console.error('Error serving index.html:', err)
+        res.status(500).send('Error loading application')
+      }
+    })
+  } else {
+    res.status(404).json({ error: 'API endpoint not found' })
   }
 })
 
