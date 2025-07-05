@@ -55,85 +55,36 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ onClose }) => {
     }
 
     try {
-      // Use the RPC function to create user
-      console.log('Creating user via RPC function...')
-      const { data: result, error: rpcError } = await supabase.rpc('create_user_account', {
-        user_email: formData.email,
-        user_password: formData.password,
-        user_full_name: formData.fullName,
-        user_role: formData.role
+      // Call backend API to create user
+      console.log('Creating user via backend API...')
+      const response = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          fullName: formData.fullName,
+          role: formData.role
+        })
       })
 
-      if (rpcError) {
-        console.error('RPC Error:', rpcError)
-        throw new Error(`Database error: ${rpcError.message}`)
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to create user account')
       }
 
-      if (result && result.success) {
+      if (result.success) {
         console.log(`User ${formData.email} created successfully!`)
         onClose()
       } else {
-        const errorMessage = result?.message || 'Failed to create user account'
-        console.error('User creation failed:', errorMessage)
-        
-        // Provide helpful error messages
-        if (errorMessage.includes('already exists')) {
-          throw new Error('A user with this email already exists')
-        } else if (errorMessage.includes('admin')) {
-          throw new Error('Only administrators can create user accounts')
-        } else if (errorMessage.includes('dashboard')) {
-          throw new Error('Please use the Supabase dashboard to create users, then assign roles here')
-        } else {
-          throw new Error(errorMessage)
-        }
+        throw new Error(result.message || 'Failed to create user account')
       }
     } catch (err) {
       console.error('User creation error:', err)
-      
-      // Try fallback method using auth.admin
-      try {
-        console.log('Trying fallback method with auth.admin...')
-        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-          email: formData.email,
-          password: formData.password,
-          email_confirm: true,
-          user_metadata: {
-            full_name: formData.fullName,
-            role: formData.role
-          }
-        })
-
-        if (authError) {
-          if (authError.message.includes('already registered')) {
-            setError('A user with this email already exists')
-          } else {
-            setError(`Authentication error: ${authError.message}`)
-          }
-          return
-        }
-
-        if (authData.user) {
-          // Create profile entry
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-              id: authData.user.id,
-              email: formData.email,
-              full_name: formData.fullName,
-              role: formData.role
-            })
-
-          if (profileError && !profileError.message.includes('duplicate key')) {
-            console.warn('Profile creation warning:', profileError)
-          }
-
-          console.log(`User ${formData.email} created successfully!`)
-          onClose()
-        }
-      } catch (fallbackErr) {
-        console.error('Fallback method also failed:', fallbackErr)
-        setError('Failed to create user account. Please check your permissions or contact your administrator.')
-      }
+      setError(err instanceof Error ? err.message : 'Failed to create user account')
     } finally {
       setLoading(false)
     }

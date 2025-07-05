@@ -98,13 +98,18 @@ const UserManagement: React.FC = () => {
     try {
       setActionLoading(userId)
       
-      const { data: result, error } = await supabase.rpc('update_user_role', {
-        target_user_email: userEmail,
-        new_role: 'admin'
+      const response = await fetch(`/api/admin/users/${userId}/role`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ role: 'admin' })
       })
 
-      if (error) {
-        throw new Error(`Failed to promote user: ${error.message}`)
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to promote user')
       }
 
       if (result && result.success) {
@@ -126,13 +131,18 @@ const UserManagement: React.FC = () => {
     try {
       setActionLoading(userId)
       
-      const { data: result, error } = await supabase.rpc('update_user_role', {
-        target_user_email: userEmail,
-        new_role: 'user'
+      const response = await fetch(`/api/admin/users/${userId}/role`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ role: 'user' })
       })
 
-      if (error) {
-        throw new Error(`Failed to demote user: ${error.message}`)
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to demote user')
       }
 
       if (result && result.success) {
@@ -157,16 +167,21 @@ const UserManagement: React.FC = () => {
     try {
       setActionLoading(userId)
       
-      // Delete from auth (this will cascade to profiles due to foreign key)
-      const { error } = await supabase.auth.admin.deleteUser(userId)
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: 'DELETE'
+      })
 
-      if (error) throw error
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to delete user')
+      }
 
       showSuccess(`User ${userEmail} has been deleted`)
       await loadUsers()
     } catch (error) {
       console.error('Error deleting user:', error)
-      showError('Failed to delete user')
+      showError(error instanceof Error ? error.message : 'Failed to delete user')
     } finally {
       setActionLoading(null)
     }
@@ -176,17 +191,24 @@ const UserManagement: React.FC = () => {
     try {
       setActionLoading(userId)
       
-      const { error } = await supabase.auth.admin.generateLink({
-        type: 'recovery',
-        email: userEmail
+      const response = await fetch(`/api/admin/users/${userId}/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: userEmail })
       })
 
-      if (error) throw error
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to generate password reset link')
+      }
 
       showSuccess(`Password reset link generated for ${userEmail}`)
     } catch (error) {
       console.error('Error generating reset link:', error)
-      showError('Failed to generate password reset link')
+      showError(error instanceof Error ? error.message : 'Failed to generate password reset link')
     } finally {
       setActionLoading(null)
     }

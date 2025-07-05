@@ -135,6 +135,197 @@ app.get('/api/admin/users', async (_req, res) => {
   }
 })
 
+// Create new user (admin only)
+app.post('/api/admin/users', async (req, res) => {
+  try {
+    const { email, password, fullName, role } = req.body
+    console.log('API: Creating new user:', email)
+    
+    if (!adminSupabase) {
+      throw new Error('Admin Supabase client not initialized')
+    }
+
+    // Validate input
+    if (!email || !password || !fullName || !role) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: email, password, fullName, role' 
+      })
+    }
+
+    // Create user using admin client
+    const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: {
+        full_name: fullName,
+        role
+      }
+    })
+
+    if (authError) {
+      console.error('Auth error:', authError)
+      if (authError.message.includes('already registered')) {
+        return res.status(400).json({ error: 'A user with this email already exists' })
+      }
+      return res.status(400).json({ error: `Authentication error: ${authError.message}` })
+    }
+
+    if (!authData.user) {
+      return res.status(400).json({ error: 'Failed to create user account' })
+    }
+
+    // Create profile entry
+    const { error: profileError } = await adminSupabase
+      .from('profiles')
+      .insert({
+        id: authData.user.id,
+        email,
+        full_name: fullName,
+        role
+      })
+
+    if (profileError && !profileError.message.includes('duplicate key')) {
+      console.warn('Profile creation warning:', profileError)
+    }
+
+    console.log('API: User created successfully:', email)
+    res.json({ 
+      success: true, 
+      message: `User ${email} created successfully`,
+      user: {
+        id: authData.user.id,
+        email,
+        full_name: fullName,
+        role
+      }
+    })
+  } catch (error) {
+    console.error('Error creating user:', error)
+    res.status(500).json({ 
+      error: error instanceof Error ? error.message : String(error)
+    })
+  }
+})
+
+// Delete user (admin only)
+app.delete('/api/admin/users/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params
+    console.log('API: Deleting user:', userId)
+    
+    if (!adminSupabase) {
+      throw new Error('Admin Supabase client not initialized')
+    }
+
+    // Delete from auth (this will cascade to profiles due to foreign key)
+    const { error } = await adminSupabase.auth.admin.deleteUser(userId)
+
+    if (error) {
+      console.error('Delete error:', error)
+      return res.status(400).json({ error: `Failed to delete user: ${error.message}` })
+    }
+
+    console.log('API: User deleted successfully:', userId)
+    res.json({ 
+      success: true, 
+      message: 'User deleted successfully' 
+    })
+  } catch (error) {
+    console.error('Error deleting user:', error)
+    res.status(500).json({ 
+      error: error instanceof Error ? error.message : String(error)
+    })
+  }
+})
+
+// Generate password reset link (admin only)
+app.post('/api/admin/users/:userId/reset-password', async (req, res) => {
+  try {
+    const { userId } = req.params
+    const { email } = req.body
+    console.log('API: Generating password reset for user:', userId, email)
+    
+    if (!adminSupabase) {
+      throw new Error('Admin Supabase client not initialized')
+    }
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' })
+    }
+
+    const { data, error } = await adminSupabase.auth.admin.generateLink({
+      type: 'recovery',
+      email
+    })
+
+    if (error) {
+      console.error('Reset link error:', error)
+      return res.status(400).json({ error: `Failed to generate reset link: ${error.message}` })
+    }
+
+    console.log('API: Password reset link generated for:', email)
+    res.json({ 
+      success: true, 
+      message: `Password reset link generated for ${email}`,
+      link: data.properties?.action_link
+    })
+  } catch (error) {
+    console.error('Error generating reset link:', error)
+    res.status(500).json({ 
+      error: error instanceof Error ? error.message : String(error)
+    })
+  }
+})
+
+// Update user role (admin only)
+app.put('/api/admin/users/:userId/role', async (req, res) => {
+  try {
+    const { userId } = req.params
+    const { role } = req.body
+    console.log('API: Updating user role:', userId, role)
+    
+    if (!adminSupabase) {
+      throw new Error('Admin Supabase client not initialized')
+    }
+
+    if (!role || !['admin', 'user'].includes(role)) {
+      return res.status(400).json({ error: 'Invalid role. Must be "admin" or "user"' })
+    }
+
+    // Update profile role
+    const { error: profileError } = await adminSupabase
+      .from('profiles')
+      .update({ role, updated_at: new Date().toISOString() })
+      .eq('id', userId)
+
+    if (profileError) {
+      console.error('Profile update error:', profileError)
+      return res.status(400).json({ error: `Failed to update role: ${profileError.message}` })
+    }
+
+    // Update user metadata
+    const { error: authError } = await adminSupabase.auth.admin.updateUserById(userId, {
+      user_metadata: { role }
+    })
+
+    if (authError) {
+      console.warn('Auth metadata update warning:', authError)
+    }
+
+    console.log('API: User role updated successfully:', userId, role)
+    res.json({ 
+      success: true, 
+      message: `User role updated to ${role}` 
+    })
+  } catch (error) {
+    console.error('Error updating user role:', error)
+    res.status(500).json({ 
+      error: error instanceof Error ? error.message : String(error)
+    })
+  }
+})
+
 // Get job by job ID
 app.get('/api/jobs/:jobId', async (req, res) => {
   try {
