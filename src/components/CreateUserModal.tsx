@@ -66,8 +66,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ onClose }) => {
 
       if (rpcError) {
         console.error('RPC Error:', rpcError)
-        setError(`Database error: ${rpcError.message}`)
-        return
+        throw new Error(`Database error: ${rpcError.message}`)
       }
 
       if (result && result.success) {
@@ -79,13 +78,13 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ onClose }) => {
         
         // Provide helpful error messages
         if (errorMessage.includes('already exists')) {
-          setError('A user with this email already exists')
+          throw new Error('A user with this email already exists')
         } else if (errorMessage.includes('admin')) {
-          setError('Only administrators can create user accounts')
+          throw new Error('Only administrators can create user accounts')
         } else if (errorMessage.includes('dashboard')) {
-          setError('Please use the Supabase dashboard to create users, then assign roles here')
+          throw new Error('Please use the Supabase dashboard to create users, then assign roles here')
         } else {
-          setError(errorMessage)
+          throw new Error(errorMessage)
         }
       }
     } catch (err) {
