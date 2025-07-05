@@ -487,12 +487,12 @@ const Dashboard: React.FC = () => {
 
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
           <div className="flex justify-between items-center py-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Job Management Dashboard</h1>
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Job Management Dashboard</h1>
               <div className="flex items-center space-x-4 mt-1">
-                <p className="text-gray-600">
+                <p className="text-sm sm:text-base text-gray-600">
                   Welcome back, {user?.user_metadata?.full_name || user?.email || 'Demo User'}
                 </p>
                 <div className="flex items-center space-x-2">
@@ -513,53 +513,54 @@ const Dashboard: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="flex space-x-3">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
               {connectionStatus === 'mock' && (
-                <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-medium flex items-center space-x-1">
+                <div className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-1">
                   <Database className="h-3 w-3" />
                   <span>Demo Mode</span>
                 </div>
               )}
               <button
                 onClick={() => setShowUserManagement(true)}
-                className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors flex items-center space-x-2"
+                className="bg-indigo-600 text-white px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-indigo-700 transition-colors flex items-center space-x-1 sm:space-x-2"
               >
-                <UserCog className="h-4 w-4" />
+                <UserCog className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">Users</span>
               </button>
               <button
                 onClick={() => setShowInviteForm(true)}
-                className="bg-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors flex items-center space-x-2"
+                className="bg-purple-600 text-white px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-purple-700 transition-colors flex items-center space-x-1 sm:space-x-2"
               >
-                <UserPlus className="h-4 w-4" />
+                <UserPlus className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">Invite Admin</span>
               </button>
               <button
                 onClick={() => setShowSubcontractors(true)}
-                className="bg-gray-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-700 transition-colors flex items-center space-x-2"
+                className="bg-gray-600 text-white px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-gray-700 transition-colors flex items-center space-x-1 sm:space-x-2"
               >
-                <Settings className="h-4 w-4" />
+                <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">Subcontractors</span>
               </button>
               <button
                 onClick={handleExportData}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center space-x-2"
+                className="bg-green-600 text-white px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-green-700 transition-colors flex items-center space-x-1 sm:space-x-2"
               >
-                <Download className="h-4 w-4" />
+                <Download className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">Export</span>
               </button>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                className="bg-blue-600 text-white px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 transition-colors flex items-center space-x-1 sm:space-x-2"
               >
-                <Plus className="h-4 w-4" />
-                <span>New Job</span>
+                <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden xs:inline">New Job</span>
+                <span className="xs:hidden">New</span>
               </button>
               <button
                 onClick={handleSignOut}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors flex items-center space-x-2"
+                className="bg-red-600 text-white px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-red-700 transition-colors flex items-center space-x-1 sm:space-x-2"
               >
-                <LogOut className="h-4 w-4" />
+                <LogOut className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">Sign Out</span>
               </button>
             </div>
@@ -567,15 +568,15 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
         {/* Demo Mode Alert */}
         {connectionStatus === 'mock' && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
             <div className="flex items-center space-x-2">
-              <Database className="h-5 w-5 text-yellow-500" />
+              <Database className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-500" />
               <div>
-                <p className="text-yellow-700 font-medium">Demo Mode Active</p>
-                <p className="text-yellow-600 text-sm">
+                <p className="text-yellow-700 font-medium text-sm sm:text-base">Demo Mode Active</p>
+                <p className="text-yellow-600 text-xs sm:text-sm">
                   You're viewing demo data. To connect to your Supabase database, please configure your environment variables.
                 </p>
               </div>
@@ -585,12 +586,12 @@ const Dashboard: React.FC = () => {
 
         {/* Error Messages */}
         {(jobsError || subcontractorsError) && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
             <div className="flex items-center space-x-2">
-              <AlertCircle className="h-5 w-5 text-red-500" />
+              <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" />
               <div>
-                <p className="text-red-700 font-medium">Error Loading Data</p>
-                <p className="text-red-600 text-sm">
+                <p className="text-red-700 font-medium text-sm sm:text-base">Error Loading Data</p>
+                <p className="text-red-600 text-xs sm:text-sm">
                   {jobsError || subcontractorsError}
                 </p>
               </div>
@@ -599,77 +600,77 @@ const Dashboard: React.FC = () => {
         )}
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 md:p-6">
             <div className="flex items-center space-x-3">
-              <div className="bg-blue-100 p-2 md:p-3 rounded-lg">
-                <Calendar className="h-5 w-5 md:h-6 md:w-6 text-blue-600" />
+              <div className="bg-blue-100 p-2 rounded-lg">
+                <Calendar className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-xs md:text-sm text-gray-600">Total Jobs</p>
-                <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.total}</p>
+                <p className="text-xs sm:text-sm text-gray-600">Total Jobs</p>
+                <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">{stats.total}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 md:p-6">
             <div className="flex items-center space-x-3">
-              <div className="bg-yellow-100 p-2 md:p-3 rounded-lg">
-                <Phone className="h-5 w-5 md:h-6 md:w-6 text-yellow-600" />
+              <div className="bg-yellow-100 p-2 rounded-lg">
+                <Phone className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-yellow-600" />
               </div>
               <div>
-                <p className="text-xs md:text-sm text-gray-600">Pending</p>
-                <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.pending}</p>
+                <p className="text-xs sm:text-sm text-gray-600">Pending</p>
+                <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">{stats.pending}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 md:p-6">
             <div className="flex items-center space-x-3">
-              <div className="bg-orange-100 p-2 md:p-3 rounded-lg">
-                <Users className="h-5 w-5 md:h-6 md:w-6 text-orange-600" />
+              <div className="bg-orange-100 p-2 rounded-lg">
+                <Users className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-orange-600" />
               </div>
               <div>
-                <p className="text-xs md:text-sm text-gray-600">In Progress</p>
-                <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.inProgress}</p>
+                <p className="text-xs sm:text-sm text-gray-600">In Progress</p>
+                <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">{stats.inProgress}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 md:p-6">
             <div className="flex items-center space-x-3">
-              <div className="bg-green-100 p-2 md:p-3 rounded-lg">
-                <MapPin className="h-5 w-5 md:h-6 md:w-6 text-green-600" />
+              <div className="bg-green-100 p-2 rounded-lg">
+                <MapPin className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-green-600" />
               </div>
               <div>
-                <p className="text-xs md:text-sm text-gray-600">Completed</p>
-                <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.completed}</p>
+                <p className="text-xs sm:text-sm text-gray-600">Completed</p>
+                <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">{stats.completed}</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Filters and Search */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 mb-8">
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 md:p-6 mb-6 sm:mb-8">
           <div className="space-y-4">
             <div>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search jobs by customer, job ID, phone, or address..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-3 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="pl-8 sm:pl-10 pr-3 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-2 sm:gap-3">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm"
               >
                 <option value="">All Statuses</option>
                 <option value="pending">Pending</option>
@@ -682,7 +683,7 @@ const Dashboard: React.FC = () => {
               <select
                 value={subcontractorFilter}
                 onChange={(e) => setSubcontractorFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm"
               >
                 <option value="">All Subcontractors</option>
                 {subcontractors.map((sub) => (
@@ -695,7 +696,7 @@ const Dashboard: React.FC = () => {
               <select
                 value={regionFilter}
                 onChange={(e) => setRegionFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm"
               >
                 <option value="">Select Region</option>
                 {regions.filter((region): region is string => Boolean(region)).map((region) => (
@@ -708,7 +709,7 @@ const Dashboard: React.FC = () => {
               <select
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm"
                 title={`Current week: ${currentWeek.start} - ${currentWeek.end} (Tuesday to Monday)`}
               >
                 <option value="">All Dates</option>
@@ -720,7 +721,7 @@ const Dashboard: React.FC = () => {
                 <option value="month">This Month</option>
               </select>
 
-              <div className="col-span-2">
+              <div className="col-span-1 sm:col-span-2">
                 <button
                   onClick={() => {
                     setSearchTerm('')
@@ -730,7 +731,7 @@ const Dashboard: React.FC = () => {
                     setDateFilter('')
                     showInfo('Filters cleared!')
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-xs sm:text-sm"
                 >
                   Clear All Filters
                 </button>
@@ -739,10 +740,10 @@ const Dashboard: React.FC = () => {
 
             {/* Week Info Display */}
             {dateFilter && (dateFilter === 'this_week' || dateFilter === 'last_week' || dateFilter === 'next_week') && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 sm:p-3">
                 <div className="flex items-center space-x-2">
-                  <Calendar className="h-4 w-4 text-blue-600" />
-                  <p className="text-blue-700 text-sm font-medium">
+                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+                  <p className="text-blue-700 text-xs sm:text-sm font-medium">
                     {dateFilter === 'this_week' && `Current week: ${currentWeek.start} - ${currentWeek.end}`}
                     {dateFilter === 'last_week' && 'Previous Tuesday to Monday'}
                     {dateFilter === 'next_week' && 'Next Tuesday to Monday'}
@@ -756,10 +757,10 @@ const Dashboard: React.FC = () => {
 
         {/* Jobs Grid */}
         {filteredJobs.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-            <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No jobs found</h3>
-            <p className="text-gray-600 mb-6">
+          <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8 lg:p-12 text-center">
+            <Calendar className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No jobs found</h3>
+            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
               {jobs.length === 0 
                 ? "Get started by creating your first job."
                 : "Try adjusting your search or filter criteria."
@@ -768,14 +769,14 @@ const Dashboard: React.FC = () => {
             {jobs.length === 0 && (
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                className="bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base font-medium hover:bg-blue-700 transition-colors"
               >
                 Create First Job
               </button>
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
             {filteredJobs.map((job) => (
               <JobCard
                 key={job.id}

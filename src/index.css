@@ -2,16 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile viewport fix */
+@viewport {
+  width: device-width;
+  initial-scale: 1.0;
+  maximum-scale: 1.0;
+  user-scalable: no;
+}
+
+/* Ensure proper mobile scaling */
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+/* Mobile-first responsive design */
+* {
+  box-sizing: border-box;
+}
+
+/* Prevent horizontal scroll on mobile */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
 /* Global app background */
 body {
   background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 /* Ensure the root element also has the background */
 #root {
   min-height: 100vh;
   background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 /* Custom light blue gradient background class */
@@ -30,4 +61,130 @@ body {
 
 .light-blue-subtle {
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 768px) {
+  /* Ensure containers don't exceed viewport */
+  .container, .max-w-7xl, .max-w-4xl, .max-w-2xl, .max-w-md {
+    max-width: 100vw !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  /* Fix grid layouts on mobile */
+  .grid {
+    gap: 0.75rem !important;
+  }
+  
+  /* Ensure buttons are touch-friendly */
+  button, .btn, input[type="submit"] {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Fix text sizing on mobile */
+  .text-xs { font-size: 0.75rem; }
+  .text-sm { font-size: 0.875rem; }
+  .text-base { font-size: 1rem; }
+  .text-lg { font-size: 1.125rem; }
+  .text-xl { font-size: 1.25rem; }
+  .text-2xl { font-size: 1.5rem; }
+  .text-3xl { font-size: 1.875rem; }
+  
+  /* Prevent zoom on input focus for iOS */
+  input, select, textarea {
+    font-size: 16px !important;
+    transform: scale(1);
+  }
+  
+  /* Fix modal sizing on mobile */
+  .fixed.inset-0 > div {
+    max-width: calc(100vw - 2rem) !important;
+    max-height: calc(100vh - 2rem) !important;
+    margin: 1rem !important;
+  }
+  
+  /* Improve table responsiveness */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Fix card layouts */
+  .rounded-xl, .rounded-2xl {
+    border-radius: 0.75rem;
+  }
+  
+  /* Ensure proper spacing */
+  .space-y-6 > * + * {
+    margin-top: 1.5rem;
+  }
+  
+  .space-y-4 > * + * {
+    margin-top: 1rem;
+  }
+  
+  .space-y-3 > * + * {
+    margin-top: 0.75rem;
+  }
+  
+  /* Fix header responsiveness */
+  .sticky.top-0 {
+    position: -webkit-sticky;
+    position: sticky;
+  }
+}
+
+/* Extra small devices (phones, 320px and up) */
+@media (max-width: 480px) {
+  .px-4 { padding-left: 0.75rem; padding-right: 0.75rem; }
+  .py-4 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+  .p-4 { padding: 0.75rem; }
+  .p-6 { padding: 1rem; }
+  .p-8 { padding: 1.25rem; }
+  
+  /* Smaller text on very small screens */
+  .text-2xl { font-size: 1.25rem; }
+  .text-3xl { font-size: 1.5rem; }
+  
+  /* Reduce margins on small screens */
+  .mb-8 { margin-bottom: 1.5rem; }
+  .mb-6 { margin-bottom: 1rem; }
+  .mb-4 { margin-bottom: 0.75rem; }
+}
+
+/* Landscape phone orientation */
+@media (max-width: 768px) and (orientation: landscape) {
+  .min-h-screen {
+    min-height: 100vh;
+  }
+  
+  /* Reduce vertical spacing in landscape */
+  .py-8 { padding-top: 1rem; padding-bottom: 1rem; }
+  .py-6 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger touch targets */
+  button, .btn, a[role="button"] {
+    min-height: 48px;
+    min-width: 48px;
+  }
+  
+  /* Remove hover effects on touch devices */
+  .hover\:bg-gray-50:hover {
+    background-color: inherit;
+  }
+  
+  .hover\:text-blue-600:hover {
+    color: inherit;
+  }
+  
+  /* Add active states for touch feedback */
+  button:active, .btn:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
 }
