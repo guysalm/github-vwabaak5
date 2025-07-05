@@ -41,35 +41,42 @@ try {
     console.error('VITE_SUPABASE_URL:', !!supabaseUrl)
     console.error('VITE_SUPABASE_ANON_KEY:', !!supabaseAnonKey)
     console.error('SUPABASE_SERVICE_ROLE_KEY:', !!supabaseServiceKey)
-    throw new Error('Missing Supabase environment variables. Please check your .env file.')
+    console.error('Missing Supabase environment variables. Please check your .env file.')
+    console.error('Server will continue with limited functionality.')
+    
+    // Initialize with dummy clients to prevent crashes
+    supabase = null
+    adminSupabase = null
+  } else {
+    console.log('Initializing Supabase clients with:', {
+      url: supabaseUrl,
+      anonKeyLength: supabaseAnonKey?.length || 0,
+      serviceKeyLength: supabaseServiceKey?.length || 0
+    })
+
+    // Regular client for non-admin operations
+    supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false
+      }
+    })
+
+    // Admin client for admin operations
+    adminSupabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false
+      }
+    })
+
+    console.log('Supabase clients initialized successfully')
   }
-
-  console.log('Initializing Supabase clients with:', {
-    url: supabaseUrl,
-    anonKeyLength: supabaseAnonKey?.length || 0,
-    serviceKeyLength: supabaseServiceKey?.length || 0
-  })
-
-  // Regular client for non-admin operations
-  supabase = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false
-    }
-  })
-
-  // Admin client for admin operations
-  adminSupabase = createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false
-    }
-  })
-
-  console.log('Supabase clients initialized successfully')
 } catch (error) {
   console.error('Failed to initialize Supabase:', error)
-  process.exit(1)
+  console.error('Server will continue with limited functionality.')
+  supabase = null
+  adminSupabase = null
 }
 
 // Global error handler middleware
@@ -101,7 +108,9 @@ app.get('/api/admin/users', async (_req, res) => {
     console.log('API: Fetching admin users list')
     
     if (!adminSupabase) {
-      throw new Error('Admin Supabase client not initialized')
+      return res.status(503).json({ 
+        error: 'Admin functionality not available. Please check server configuration.' 
+      })
     }
     
     // Get users from profiles table
@@ -148,7 +157,9 @@ app.post('/api/admin/users', async (req, res) => {
     console.log('API: Creating new user:', email)
     
     if (!adminSupabase) {
-      throw new Error('Admin Supabase client not initialized')
+      return res.status(503).json({ 
+        error: 'Admin functionality not available. Please check server configuration.' 
+      })
     }
 
     // Validate input
@@ -225,7 +236,9 @@ app.delete('/api/admin/users/:userId', async (req, res) => {
     console.log('API: Deleting user:', userId)
     
     if (!adminSupabase) {
-      throw new Error('Admin Supabase client not initialized')
+      return res.status(503).json({ 
+        error: 'Admin functionality not available. Please check server configuration.' 
+      })
     }
 
     // Delete from auth (this will cascade to profiles due to foreign key)
@@ -257,7 +270,9 @@ app.post('/api/admin/users/:userId/reset-password', async (req, res) => {
     console.log('API: Generating password reset for user:', userId, email)
     
     if (!adminSupabase) {
-      throw new Error('Admin Supabase client not initialized')
+      return res.status(503).json({ 
+        error: 'Admin functionality not available. Please check server configuration.' 
+      })
     }
 
     if (!email) {
@@ -343,7 +358,9 @@ app.get('/api/jobs/:jobId', async (req, res) => {
     console.log('API: Fetching job with ID:', jobId)
     
     if (!supabase) {
-      throw new Error('Supabase client not initialized')
+      return res.status(503).json({ 
+        error: 'Database functionality not available. Please check server configuration.' 
+      })
     }
     
     const { data, error } = await supabase
@@ -388,7 +405,9 @@ app.put('/api/jobs/:jobId', async (req, res) => {
     console.log('API: Updating job with ID:', jobId, 'Updates:', updates)
     
     if (!supabase) {
-      throw new Error('Supabase client not initialized')
+      return res.status(503).json({ 
+        error: 'Database functionality not available. Please check server configuration.' 
+      })
     }
     
     const { data, error } = await supabase
