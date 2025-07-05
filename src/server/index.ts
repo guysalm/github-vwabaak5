@@ -4,34 +4,9 @@ import cors from 'cors'
 import path from 'path'
 import { createClient } from '@supabase/supabase-js'
 import { createServer } from 'http'
-import net from 'net'
 
 const app = express()
-let PORT = 3001
-
-// Function to check if port is available
-const isPortAvailable = (port: number): Promise<boolean> => {
-  return new Promise((resolve) => {
-    const server = net.createServer()
-    server.listen(port, () => {
-      server.once('close', () => resolve(true))
-      server.close()
-    })
-    server.on('error', () => resolve(false))
-  })
-}
-
-// Function to find available port
-const findAvailablePort = async (startPort: number): Promise<number> => {
-  let port = startPort
-  while (port < startPort + 100) { // Try up to 100 ports
-    if (await isPortAvailable(port)) {
-      return port
-    }
-    port++
-  }
-  throw new Error(`No available port found starting from ${startPort}`)
-}
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3001
 
 // Global error handlers
 process.on('uncaughtException', (error) => {
@@ -482,12 +457,8 @@ app.get('*', (req, res) => {
 })
 
 // Start server with error handling
-const startServer = async () => {
+const startServer = () => {
   try {
-    // Find an available port
-    PORT = await findAvailablePort(3001)
-    console.log(`Using port ${PORT}`)
-    
     const server = app.listen(PORT, () => {
       console.log(`API server running on http://localhost:${PORT}`)
       console.log(`Health check: http://localhost:${PORT}/api/health`)
@@ -496,10 +467,7 @@ const startServer = async () => {
     server.on('error', (error) => {
       console.error('Server error:', error)
       if ((error as any).code === 'EADDRINUSE') {
-        console.error(`Port ${PORT} is already in use. Trying to find another port...`)
-        // Try to restart with a different port
-        setTimeout(() => startServer(), 1000)
-        return
+        console.error(`Port ${PORT} is already in use. Please stop the process using this port or set a different PORT environment variable.`)
       }
       process.exit(1)
     })
