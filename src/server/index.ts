@@ -206,18 +206,22 @@ app.post('/api/admin/users', async (req, res) => {
       return res.status(400).json({ error: 'Failed to create user account' })
     }
 
-    // Create profile entry
+    // Wait a moment for the trigger to create the profile, then update it with our data
+    await new Promise(resolve => setTimeout(resolve, 100))
+    
+    // Update the profile with our specific data (the trigger may have created it with default values)
     const { error: profileError } = await adminSupabase
       .from('profiles')
-      .insert({
-        id: authData.user.id,
+      .update({
         email,
         full_name: fullName,
         role
       })
+      .eq('id', authData.user.id)
 
-    if (profileError && !profileError.message.includes('duplicate key')) {
-      console.warn('Profile creation warning:', profileError)
+    if (profileError) {
+      console.warn('Profile update warning:', profileError)
+      // Don't fail the request if profile update fails, as the user was created successfully
     }
 
     console.log('API: User created successfully:', email)
