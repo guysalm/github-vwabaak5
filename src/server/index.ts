@@ -2,9 +2,35 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import { createClient } from '@supabase/supabase-js'
+import { createServer } from 'http'
+import net from 'net'
 
 const app = express()
-const PORT = 3001
+let PORT = 3001
+
+// Function to check if port is available
+const isPortAvailable = (port: number): Promise<boolean> => {
+  return new Promise((resolve) => {
+    const server = net.createServer()
+    server.listen(port, () => {
+      server.once('close', () => resolve(true))
+      server.close()
+    })
+    server.on('error', () => resolve(false))
+  })
+}
+
+// Function to find available port
+const findAvailablePort = async (startPort: number): Promise<number> => {
+  let port = startPort
+  while (port < startPort + 100) { // Try up to 100 ports
+    if (await isPortAvailable(port)) {
+      return port
+    }
+    port++
+  }
+  throw new Error(`No available port found starting from ${startPort}`)
+}
 
 // Global error handlers
 process.on('uncaughtException', (error) => {
@@ -431,38 +457,50 @@ app.get('/api/health', (_req, res) => {
 })
 
 // Start server with error handling
-try {
-  const server = app.listen(PORT, () => {
-    console.log(`API server running on http://localhost:${PORT}`)
-    console.log(`Health check: http://localhost:${PORT}/api/health`)
-  })
+const startServer = async () => {
+  try {
+    // Find an available port
+    PORT = await findAvailablePort(3001)
+    console.log(`Using port ${PORT}`)
+    
+    const server = app.listen(PORT, () => {
+      console.log(`API server running on http://localhost:${PORT}`)
+      console.log(`Health check: http://localhost:${PORT}/api/health`)
+    })
 
-  server.on('error', (error) => {
-    console.error('Server error:', error)
-    if ((error as any).code === 'EADDRINUSE') {
-      console.error(`Port ${PORT} is already in use. Please stop any other processes using this port.`)
-    }
+    server.on('error', (error) => {
+      console.error('Server error:', error)
+      if ((error as any).code === 'EADDRINUSE') {
+        console.error(`Port ${PORT} is already in use. Trying to find another port...`)
+        // Try to restart with a different port
+        setTimeout(() => startServer(), 1000)
+        return
+      }
+      process.exit(1)
+    })
+
+    // Graceful shutdown
+    process.on('SIGTERM', () => {
+      console.log('SIGTERM received, shutting down gracefully')
+      server.close(() => {
+        console.log('Server closed')
+        process.exit(0)
+      })
+    })
+
+    process.on('SIGINT', () => {
+      console.log('SIGINT received, shutting down gracefully')
+      server.close(() => {
+        console.log('Server closed')
+        process.exit(0)
+      })
+    })
+
+  } catch (error) {
+    console.error('Failed to start server:', error)
     process.exit(1)
-  })
-
-  // Graceful shutdown
-  process.on('SIGTERM', () => {
-    console.log('SIGTERM received, shutting down gracefully')
-    server.close(() => {
-      console.log('Server closed')
-      process.exit(0)
-    })
-  })
-
-  process.on('SIGINT', () => {
-    console.log('SIGINT received, shutting down gracefully')
-    server.close(() => {
-      console.log('Server closed')
-      process.exit(0)
-    })
-  })
-
-} catch (error) {
-  console.error('Failed to start server:', error)
-  process.exit(1)
+  }
 }
+
+// Start the server
+startServer()
